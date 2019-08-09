@@ -34,14 +34,23 @@ function showPosition(position) {
 
     if (data.main.temp){
       let Temperature = document.getElementById('displaytemp');
+      let Humidity = document.getElementById('displayhumidity');
+      let userHumidity = data.main.humidity
       userTemp = (data.main.temp - 273.15) * 9/5 + 32
-      Temperature.innerHTML = 'The temperature at ' + userLat + ', ' + userLong + ' is ' + Math.trunc(userTemp) + ' degrees Fahrenheit';
+      Temperature.innerHTML = `The temperature at ${userLat}, ${userLong} is ${Math.trunc(userTemp)} degrees Fahrenheit.`;
+      Humidity.innerHTML = `The humidity at ${userLat}, ${userLong} is ${userHumidity}%.`;
     }
     else {
       Temperature.innerHTML = 'Unable to get weather! Please try again later';
     }
     
   })
+
+  // switch (userTemp) {
+  //   case 0-32:
+  //     body.
+  // }
+
 
 // catch any errors
   .catch(function() {
