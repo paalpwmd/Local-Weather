@@ -3,22 +3,24 @@ let data = "";
 let userlat = '';
 let userLong = '';
 let key = 'd92ff65ad9912e2bb717f67fa1000369'
+let userTemp = ''
 
 
-//create variables for userLat and userLong to append to URL
-//call weatherBalloon with userLat and userLong ##AFTER DOCUMENT LOAD AND LOCATION APPROVED#
-
-
+//Uses built in geolocation feature in HTML5 to get users position.
 function getLocation() {
   if (navigator.geolocation) {
-
     let browserlocation = navigator.geolocation;
     navigator.geolocation.getCurrentPosition(showPosition);
   } else {
-    userLocation = "Geolocation is not supported by this browser.";
+    //Returns Error if Geolocation API is not supported by browser 
+    let browserLocation = document.getElementById('displaytemp');
+    browserLocation.innerHTML = 'Geolocation is not supported by browser'
   }
 }
 
+//Gets position of user, and assigns longitude and latitude to variables.
+//Fetches OpenWeatherAPI using authentication key and user location data
+//Returns JSON response
 function showPosition(position) {
   userLat = Math.trunc(position.coords.latitude);
   userLong = Math.trunc(position.coords.longitude);
@@ -27,16 +29,16 @@ function showPosition(position) {
     return resp.json() 
   }) 
 
-  // Convert data to json
+  // Displays the temperature of the user based on their location
   .then(function(data) {
 
     if (data.main.temp){
       let Temperature = document.getElementById('displaytemp');
-      let userTemp = (data.main.temp - 273.15) * 9/5 + 32
-      Temperature.innerHTML = 'The Temperature in Clayton, MO is ' + Math.trunc(userTemp) + ' degrees Fahrenheit';
+      userTemp = (data.main.temp - 273.15) * 9/5 + 32
+      Temperature.innerHTML = 'The temperature at ' + userLat + ', ' + userLong + ' is ' + Math.trunc(userTemp) + ' degrees Fahrenheit';
     }
     else {
-      console.log('Unable to get weather! Please try again later')
+      Temperature.innerHTML = 'Unable to get weather! Please try again later';
     }
     
   })
@@ -47,13 +49,5 @@ function showPosition(position) {
   });
 }
 
-//Returns location of user on load
+//Runs scripts on document load
 document.onload = getLocation();
-
-
-
-
-
-
-
-
