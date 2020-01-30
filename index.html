@@ -14,18 +14,30 @@
 
   </head>
   <body>
+    <div id="clouds">
+      <div class="cloud x1"></div>
+      <!-- Time for multiple clouds to dance around -->
+      <div class="cloud x2"></div>
+      <div class="cloud x3"></div>
+      <div class="cloud x4"></div>
+      <div class="cloud x5"></div>
+    </div>
     <div id="WeatherReport">
-      <p id="displaytemp">
+      <p class="hidden" id="intro">The weather in...</p>
+      <p id="displaylocation">
         Please allow your location to get the weather.
       </p>
-      <p id = "displayhumidity">
-        
-      </p>
+      <p id = "displaytemp"></p>
+      <p id="displayhumidity"></p>
   </div>
 
     <div id="location">
 
     </div>
-    <script src="scripts.js"></script>
+    <script
+			  src="https://code.jquery.com/jquery-3.4.1.min.js"
+			  integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+        crossorigin="anonymous"></script>
+        <script src="scripts.js"></script>
   </body>
 </html>

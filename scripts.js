@@ -1,62 +1,75 @@
-let request = new XMLHttpRequest();
-let data = "";
-let userlat = '';
-let userLong = '';
-let key = 'd92ff65ad9912e2bb717f67fa1000369'
-let userTemp = ''
+let userLat;
+let userLong;
+let userLocation;
+let userHumidity;
+let userCity;
 
+// Uses built in geolocation feature in HTML5 to get users position.
 
-//Uses built in geolocation feature in HTML5 to get users position.
-function getLocation() {
+let getLocation = new Promise ((resolve, reject) => {
   if (navigator.geolocation) {
-    let browserlocation = navigator.geolocation;
-    navigator.geolocation.getCurrentPosition(showPosition);
+    navigator.geolocation.getCurrentPosition(getWeather);
+    resolve(console.log("Got position"))
   } else {
     //Returns Error if Geolocation API is not supported by browser 
-    let browserLocation = document.getElementById('displaytemp');
+    let browserLocation = document.getElementById('displaylocation');
     browserLocation.innerHTML = 'Geolocation is not supported by browser'
   }
-}
+})
 
-//Gets position of user, and assigns longitude and latitude to variables.
-//Fetches OpenWeatherAPI using authentication key and user location data
-//Returns JSON response
-function showPosition(position) {
-  userLat = Math.trunc(position.coords.latitude);
-  userLong = Math.trunc(position.coords.longitude);
-  fetch('https://api.openweathermap.org/data/2.5/weather?lat=' + userLat +'&lon=' + userLong + '&appid=' + key)  
-  .then(function(resp) { 
-    return resp.json() 
-  }) 
+function getWeather(position){
 
-  // Displays the temperature of the user based on their location
-  .then(function(data) {
+  userLat = position.coords.latitude;
+  userLong = position.coords.longitude;
 
-    if (data.main.temp){
-      let Temperature = document.getElementById('displaytemp');
-      let Humidity = document.getElementById('displayhumidity');
-      let userHumidity = data.main.humidity
-      userTemp = (data.main.temp - 273.15) * 9/5 + 32
-      Temperature.innerHTML = `The temperature at ${userLat}, ${userLong} is ${Math.trunc(userTemp)} degrees Fahrenheit.`;
-      Humidity.innerHTML = `The humidity at ${userLat}, ${userLong} is ${userHumidity}%.`;
-    }
-    else {
-      Temperature.innerHTML = 'Unable to get weather! Please try again later';
-    }
-    
+  fetch('https://fcc-weather-api.glitch.me/api/current?lat=' + userLat + '&lon=' +userLong)
+
+  .then((response) => {
+    return response.json();
   })
-
-  // switch (userTemp) {
-  //   case 0-32:
-  //     body.
-  // }
-
-
-// catch any errors
-  .catch(function() {
-    
-  });
+  .then((data) => {
+    userLocation = data.name;
+    userHumidity = data.main.humidity;
+    userTemp = Math.trunc((data.main.temp * 9/5) + 32);
+    getCity();
+  })
 }
 
-//Runs scripts on document load
-document.onload = getLocation();
+function getCity(){
+
+  fetch('https://api.opencagedata.com/geocode/v1/json?key=dda07364042a4b3cbd042c494323cf24&q=' + userLat + '%2C' + userLong + '&pretty=1')
+  .then((response) => {
+    return response.json();
+  })
+  .then((data) => {
+  userCity = data.results[0].components.state;
+  myFunction(data);
+  })
+  }
+
+  let timeLeft = 6;
+  function countDown(){
+    $('#intro').toggleClass('hidden');
+    $('#displaytemp').toggleClass('hidden');
+    $('#displayhumidity').toggleClass('hidden');
+    setInterval(function(){
+      timeLeft--;
+      if(timeLeft <= 0){
+        window.location.reload();
+      } else {
+        $('#displaylocation').html(`<p>Error connecting to our servers. Please wait ${timeLeft}s</p>`);
+        
+    } }, 1000);
+  }
+  
+//fix weird api glitch that defaults to Shuzenji, JP.
+function myFunction(data){
+  $('#intro').toggleClass('hidden');
+  $('#displaytemp').html(`<p>is ${userTemp}°F</p>`);
+  if (userLocation == 'Shuzenji'){
+    countDown();
+  } else {
+    $('#displaylocation').html(`<h1>${userLocation}, ${userCity}</h1>`);
+  }
+  $('#displayhumidity').html(`<p><em>with ${userHumidity}% humidity </em></p>`);
+}
